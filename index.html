@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadeado</title>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      transition: background-color 1s; /* Smooth transition for background color */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    
+    body.open {
+      background-color: #4CAF50; /* Green background for open Gate */
+    }
+
+    body.closed {
+      background-color: #f44336; /* Red background for closed Gate */
+    }
+
+    .Gate-container {
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background: #fff;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7f6;
+      color: #333;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    
+    .Gate-container {
+      max-width: 300px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .status-display {
+      margin-bottom: 20px;
+      padding: 10px;
+      font-size: 1.5em;
+      border-radius: 5px;
+      background-color: #ddd;
+      color: #555;
+    }
+
+    .button-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .Gate-button {
+      padding: 15px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      outline: none;
+    }
+
+    #openButton {
+      background-color: #4CAF50;
+    }
+
+    #closeButton {
+      background-color: #f44336;
+    }
+
+    .Gate-button:hover {
+      opacity: 0.9;
+    }
+    @media (max-width: 600px) {
+      .Gate-container {
+        width: 90%;
+      }
+    }
+    .Gate-emotion {
+      font-size: 4rem;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body class="closed" id="bodyBackground">
+
+<div class="Gate-container" id="GateContainer">
+  <div id="GateEmotion" class="Gate-emotion">🔒</div>
+  <div class="status-display" id="GateStatus">Gate is Closed</div>
+  <div class="button-container">
+    <button id="openButton" class="Gate-button">Open Gate</button>
+    <button id="closeButton" class="Gate-button">Close Gate</button>
+  </div>
+</div>
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+  import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyDPxhGgiB8Trmt5yMXPNExr1B6t07I5WC4",
+    authDomain: "teste-649fc.firebaseapp.com",
+    databaseURL: "https://teste-649fc-default-rtdb.firebaseio.com",
+    projectId: "teste-649fc",
+    storageBucket: "teste-649fc.appspot.com",
+    messagingSenderId: "51996457383",
+    appId: "1:51996457383:web:75ecc2aa033a7e0abb9e82",
+    measurementId: "G-NZ41TRB21V"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  // Reference to the Gate state in the database
+  const GateStateRef = ref(database, 'gate/state');
+
+  // Function to update the Gate status and emotion in the Firebase database
+  function updateGateStatus(status) {
+    // Update the status in the Firebase database
+    set(GateStateRef, status).then(() => {
+      console.log('Gate status updated successfully.');
+      const bodyBackground = document.getElementById('bodyBackground');
+      const GateEmotion = document.getElementById('GateEmotion');
+      const GateStatus = document.getElementById('GateStatus');
+      if (status === 1) {
+        bodyBackground.className = 'open';
+        GateEmotion.textContent = '🔓'; // Open lock emoji
+        GateStatus.textContent = 'Gate is Open';
+      } else {
+        bodyBackground.className = 'closed';
+        GateEmotion.textContent = '🔒'; // Closed lock emoji
+        GateStatus.textContent = 'Gate is Closed';
+      }
+    }).catch((error) => {
+      console.log('Failed to update Gate status.' + error);
+    });
+  }
+
+  // Listen for Gate state changes
+  onValue(GateStateRef, (snapshot) => {
+    const status = snapshot.val();
+    updateGateStatus(status);
+  });
+
+  // Button click events
+  document.getElementById('openButton').addEventListener('click', () => updateGateStatus(1));
+  document.getElementById('closeButton').addEventListener('click', () => updateGateStatus(0));
+</script>
+
+</body>
+</html>
