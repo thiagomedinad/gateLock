@@ -137,7 +137,7 @@
   const database = getDatabase(app);
 
   // Reference to the Gate state in the database
-  const GateStateRef = ref(database, 'gate/state');
+  const GateStateRef = ref(database, 'gate/status');
 
   // Function to update the Gate status and emotion in the Firebase database
   function updateGateStatus(status) {
